@@ -93,6 +93,7 @@ export class GLSL2MP4{
     }
 
     SetShader(src:string){
+        this.src = src;
         this.mesh.material = new THREE.RawShaderMaterial({
             vertexShader:vertex,
             fragmentShader:src,
@@ -101,6 +102,7 @@ export class GLSL2MP4{
 
     }
     SetUniform(uniforms:{ [uniform: string]: THREE.IUniform }){
+        this.uniforms = uniforms;
         this.mesh.material = new THREE.RawShaderMaterial({
             vertexShader:vertex,
             fragmentShader:this.src,

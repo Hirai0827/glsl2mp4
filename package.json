@@ -1,0 +1,22 @@
+{
+  "name": "glsl2mp4",
+  "version": "1.0.0",
+  "main": "build/index.js",
+  "author": "hirai <ryu1999827@gmail.com>",
+  "license": "MIT",
+  "files": [
+    "build"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prepare": "npm run build"
+  },
+  "devDependencies": {
+    "typescript": "^4.1.2"
+  },
+  "dependencies": {
+    "@ffmpeg/core": "^0.8.4",
+    "@ffmpeg/ffmpeg": "^0.9.5",
+    "three": "^0.122.0"
+  }
+}

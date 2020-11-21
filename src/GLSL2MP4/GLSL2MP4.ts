@@ -109,7 +109,7 @@ export class GLSL2MP4{
 
     }
 
-    AddFrame:(targetCanvas:HTMLCanvasElement) => HTMLCanvasElement = (targetCanvas:HTMLCanvasElement) => {
+    AddFrame:() => HTMLCanvasElement = () => {
         this.renderer.render(this.scene,this.camera);
         const canvas = this.gl.canvas as HTMLCanvasElement;
         const context = this.canvas2D.getContext("2d") as CanvasRenderingContext2D;

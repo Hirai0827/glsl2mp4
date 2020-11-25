@@ -9,7 +9,7 @@ npm install https://github.com/Hirai0827/glsl2mp4
 yarn add https://github.com/Hirai0827/glsl2mp4
 ```
 
-#usage
+# usage
 ```js
 const converter = new GLSL2MP4(500,500);
 converter.SetShader(fragmentShaderStr);

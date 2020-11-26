@@ -17,6 +17,6 @@ for(let i = 0.0;i < 60; i+=1.0){
   converter.SetUniform({iTime:{value:i/60.0},iResolution:{value:new THREE.Vec3(500,500,1)}});
   converter.AddFrame(canvasRef.current);
 }
-converter.GenerateMp4(30).then(e => {todoWithVideo(e)/*something todo video*/;});
+converter.GenerateMp4(60).then(e => {todoWithVideo(e)/*something todo with video*/;});
 
 ```

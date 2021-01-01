@@ -44,6 +44,7 @@ void main() {
 export class GLSL2MP4{
     width:number;
     height:number;
+    showTextMode:boolean;
     gl:WebGLRenderingContext;
     renderer:THREE.WebGLRenderer;
     camera:THREE.OrthographicCamera;
@@ -55,9 +56,10 @@ export class GLSL2MP4{
     frameBuffer:Array<string>;
     canvas2D:HTMLCanvasElement;
 
-    constructor(width:number,height:number,uniforms?:{ [uniform: string]: THREE.IUniform },src?:string) {
+    constructor(width:number,height:number,uniforms?:{ [uniform: string]: THREE.IUniform },src?:string,showTextMode?:boolean) {
         this.width = width;
         this.height = height;
+        this.showTextMode = showTextMode?showTextMode : false;
         this.frameBuffer = new Array<string>();
         const canvas = document.createElement("canvas");
         canvas.width = width;
@@ -116,6 +118,10 @@ export class GLSL2MP4{
         const canvas = this.gl.canvas as HTMLCanvasElement;
         const context = this.canvas2D.getContext("2d") as CanvasRenderingContext2D;
         context.drawImage(canvas,0,0);
+        if(this.showTextMode){
+            context.font = "24px serif";
+            context.strokeText(this.src,0,0);
+        }
         const uri = this.canvas2D.toDataURL();
         this.frameBuffer.push(uri);
             return canvas;

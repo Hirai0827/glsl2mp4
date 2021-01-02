@@ -41,9 +41,22 @@ void main() {
 }
 `;
 
+type CodeColors = {
+    normal:string;
+    reserved:string;
+    operator:string;
+    commentout:string;
+}
+
 export class GLSL2MP4{
     width:number;
     height:number;
+    showTextMode:boolean;
+    fontName:string;
+    fontSize:number;
+    padding:number;
+    spacing:number;
+    codeColors:CodeColors;
     gl:WebGLRenderingContext;
     renderer:THREE.WebGLRenderer;
     camera:THREE.OrthographicCamera;
@@ -52,13 +65,25 @@ export class GLSL2MP4{
     mesh:THREE.Mesh;
     uniforms:{ [uniform: string]: THREE.IUniform };
     src:string;
+    displaySrc:string;
     frameBuffer:Array<string>;
     canvas2D:HTMLCanvasElement;
 
-    constructor(width:number,height:number,uniforms?:{ [uniform: string]: THREE.IUniform },src?:string) {
+    constructor(width:number,height:number,uniforms?:{ [uniform: string]: THREE.IUniform },src?:string,showTextMode?:boolean) {
         this.width = width;
         this.height = height;
+        this.showTextMode = showTextMode?showTextMode : false;
+        this.fontName = "Monospace";
+        this.fontSize = 12;
+        this.padding = 5;
+        this.spacing = 2;
         this.frameBuffer = new Array<string>();
+        this.codeColors = {
+            normal:"rgb(255,255,255)",
+            reserved:"rgb(255,0,0)",
+            operator:"rgb(0,255,0)",
+            commentout:"rgb(100,100,100)"
+        }
         const canvas = document.createElement("canvas");
         canvas.width = width;
         canvas.height = height;
@@ -80,6 +105,7 @@ export class GLSL2MP4{
         );
         this.scene = new THREE.Scene();
         this.src = src ? src : frag;
+        this.displaySrc = "";
         this.uniforms = uniforms ? uniforms : {};
         const plane = new THREE.PlaneBufferGeometry(2, 2);
         this.material = new THREE.RawShaderMaterial({
@@ -92,8 +118,9 @@ export class GLSL2MP4{
 
     }
 
-    SetShader(src:string){
+    SetShader(src:string,displaySrc?:string){
         this.src = src;
+        this.displaySrc = displaySrc ? displaySrc : "";
         this.mesh.material = new THREE.RawShaderMaterial({
             vertexShader:vertex,
             fragmentShader:src,
@@ -116,14 +143,86 @@ export class GLSL2MP4{
         const canvas = this.gl.canvas as HTMLCanvasElement;
         const context = this.canvas2D.getContext("2d") as CanvasRenderingContext2D;
         context.drawImage(canvas,0,0);
+        if(this.showTextMode){
+            if(this.displaySrc){
+                this.drawGLSLCode(context,this.displaySrc);
+            }else{
+                this.drawGLSLCode(context,this.src);
+            }
+        }
         const uri = this.canvas2D.toDataURL();
         this.frameBuffer.push(uri);
-            return canvas;
+        return canvas;
     };
     createObjectUrl = (array:Array<any>, options:any)=>{
         const blob = new Blob(array, options);
         const objectUrl = URL.createObjectURL(blob);
         return objectUrl;
+    };
+
+    drawGLSLCode = (context:CanvasRenderingContext2D,src:string) => {
+        const operatorRexExp = new RegExp("\\+|\\-|\\*|/|%");
+        const spaceRegExp = new RegExp("\\s|\\t|;");
+        const commentoutRegExp = new RegExp("(//)");
+        const typeRegExp = new RegExp("(int)|(float)|(vec2)|(vec3)|(vec4)|(sampler2D)|(void)|(uniform)|(in)|(out)|(precision)|(highp)|(mediump)|(lowp)");
+        const bracketsRegExp = new RegExp("\\(|\\)");
+        const splitRegExp = new RegExp(`${commentoutRegExp.source}|${spaceRegExp.source}|${operatorRexExp.source}|${bracketsRegExp.source}`,"g");
+        const split = src.split('\n');
+        context.font = `bold ${this.fontSize}px ${this.fontName}`;
+        for(let i = 0; i < split.length; i++){
+            let beginIndex = 0;
+            let endIndex = 0;
+            let x = this.padding;
+            const totalWidth = context.measureText(split[i]).width;
+            context.fillStyle = "rgba(0,0,0,0.5)";
+            context.fillRect(this.padding,this.fontSize * i + this.spacing * (i+1)+this.padding,totalWidth,this.fontSize + this.spacing);
+            splitRegExp.lastIndex = 0;
+            while(true){
+                const regres = splitRegExp.exec(split[i]);
+                if(regres){
+                    endIndex = splitRegExp.lastIndex;
+                    //文節を取り出す
+                    const phrase = split[i].substring(beginIndex,endIndex - regres[0].length);
+                    //文節のレンダリング
+                    let width = context.measureText(phrase).width;
+                    context.fillStyle = (typeRegExp.test(phrase))?this.codeColors.reserved:this.codeColors.normal;
+                    context.fillText(phrase,x,(this.fontSize + this.spacing) * (i + 1)+this.padding);
+                    x += width;
+                    const separator = regres[0];
+                    //separatorのレンダリング
+                    //TODO コメントアウトの分岐　各々着色
+                    if(commentoutRegExp.test(separator)){
+                        let width = context.measureText(separator).width;
+                        context.fillStyle = this.codeColors.commentout;
+                        context.fillText(separator,x,(this.fontSize + this.spacing) * (i + 1)+this.padding);
+                        x += width;
+                        beginIndex = endIndex;
+                        endIndex = split[i].length;
+                        const phrase = split[i].substring(beginIndex,endIndex);
+                        width = context.measureText(phrase).width;
+                        context.fillText(phrase,x,(this.fontSize + this.spacing) * (i + 1)+this.padding);
+                        x += width;
+
+
+                        break;
+
+                    }
+                    width = context.measureText(separator).width;
+                    context.fillStyle = this.codeColors.operator;
+                    context.fillText(separator,x,(this.fontSize + this.spacing) * (i + 1)+this.padding);
+                    x += width;
+                    beginIndex = endIndex;
+                }else{
+                    endIndex = split[i].length;
+                    context.fillStyle = this.codeColors.normal;
+                    const phrase = split[i].substring(beginIndex,endIndex);
+                    //レンダリング
+                    context.fillText(phrase,x,(this.fontSize + this.spacing) * (i + 1)+this.padding);
+
+                    break;
+                }
+            }
+        }
     };
     GenerateMp4 = async (frameRate?:number,height?:number,width?:number,showLog?:boolean) => {
         height = height? height : this.height;

@@ -163,7 +163,7 @@ export class GLSL2MP4{
     drawGLSLCode = (context:CanvasRenderingContext2D,src:string) => {
         const operatorRexExp = new RegExp("\\+|\\-|\\*|/|%");
         const spaceRegExp = new RegExp("\\s|\\t|;");
-        const commentoutRegExp = new RegExp("//");
+        const commentoutRegExp = new RegExp("(//)");
         const typeRegExp = new RegExp("(int)|(float)|(vec2)|(vec3)|(vec4)|(sampler2D)|(void)|(uniform)|(in)|(out)|(precision)|(highp)|(mediump)|(lowp)");
         const bracketsRegExp = new RegExp("\\(|\\)");
         const splitRegExp = new RegExp(`${operatorRexExp.source}|${spaceRegExp.source}|${commentoutRegExp.source}|${bracketsRegExp.source}`,"g");

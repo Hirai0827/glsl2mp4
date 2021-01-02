@@ -183,7 +183,6 @@ export class GLSL2MP4{
                     //文節を取り出す
                     const phrase = split[i].substring(beginIndex,endIndex - regres[0].length);
                     //文節のレンダリング
-                    //TODO reservedなら着色
                     let width = context.measureText(phrase).width;
                     context.fillStyle = (typeRegExp.test(phrase))?this.codeColors.reserved:this.codeColors.normal;
                     context.fillText(phrase,x,(this.fontSize + this.spacing) * (i + 1)+this.padding);
@@ -191,6 +190,23 @@ export class GLSL2MP4{
                     const separator = regres[0];
                     //separatorのレンダリング
                     //TODO コメントアウトの分岐　各々着色
+                    if(commentoutRegExp.test(separator)){
+                        let width = context.measureText(separator).width;
+                        context.fillStyle = this.codeColors.commentout;
+                        context.fillText(separator,x,(this.fontSize + this.spacing) * (i + 1)+this.padding);
+                        x += width;
+                        beginIndex = endIndex;
+                        endIndex = split[i].length;
+                        const phrase = split[i].substring(beginIndex,endIndex);
+                        width = context.measureText(phrase).width;
+                        context.fillStyle = (typeRegExp.test(phrase))?this.codeColors.reserved:this.codeColors.normal;
+                        context.fillText(phrase,x,(this.fontSize + this.spacing) * (i + 1)+this.padding);
+                        x += width;
+
+
+                        break;
+
+                    }
                     width = context.measureText(separator).width;
                     context.fillStyle = this.codeColors.operator;
                     context.fillText(separator,x,(this.fontSize + this.spacing) * (i + 1)+this.padding);
@@ -206,14 +222,6 @@ export class GLSL2MP4{
                     break;
                 }
             }
-            // const phrases = split[i].split(' ');//TODO 正規表現で分ける(Operator,Commentout,Space,Tab辺りを区切り点とする)
-            // for(let j = 0; j < phrases.length; j++){
-            //     context.fillStyle = "rgba(255,255,255,1.0)";
-            //     const phrase = phrases[j] + " ";
-            //     const width = context.measureText(phrase).width;
-            //     context.fillText(phrase,x,(this.fontSize + this.spacing) * (i + 1)+this.padding);
-            //     x += width;
-            // }
         }
     };
     GenerateMp4 = async (frameRate?:number,height?:number,width?:number,showLog?:boolean) => {

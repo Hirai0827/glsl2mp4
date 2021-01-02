@@ -176,6 +176,7 @@ export class GLSL2MP4{
             const totalWidth = context.measureText(split[i]).width;
             context.fillStyle = "rgba(0,0,0,0.5)";
             context.fillRect(this.padding,this.fontSize * i + this.spacing * (i+1)+this.padding,totalWidth,this.fontSize + this.spacing);
+            splitRegExp.lastIndex = 0;
             while(true){
                 const regres = splitRegExp.exec(split[i]);
                 if(regres){

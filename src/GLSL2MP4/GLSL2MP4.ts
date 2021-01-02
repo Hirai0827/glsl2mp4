@@ -199,7 +199,6 @@ export class GLSL2MP4{
                         endIndex = split[i].length;
                         const phrase = split[i].substring(beginIndex,endIndex);
                         width = context.measureText(phrase).width;
-                        context.fillStyle = (typeRegExp.test(phrase))?this.codeColors.reserved:this.codeColors.normal;
                         context.fillText(phrase,x,(this.fontSize + this.spacing) * (i + 1)+this.padding);
                         x += width;
 

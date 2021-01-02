@@ -166,7 +166,7 @@ export class GLSL2MP4{
         const commentoutRegExp = new RegExp("(//)");
         const typeRegExp = new RegExp("(int)|(float)|(vec2)|(vec3)|(vec4)|(sampler2D)|(void)|(uniform)|(in)|(out)|(precision)|(highp)|(mediump)|(lowp)");
         const bracketsRegExp = new RegExp("\\(|\\)");
-        const splitRegExp = new RegExp(`${operatorRexExp.source}|${spaceRegExp.source}|${commentoutRegExp.source}|${bracketsRegExp.source}`,"g");
+        const splitRegExp = new RegExp(`${commentoutRegExp.source}|${spaceRegExp.source}|${operatorRexExp.source}|${bracketsRegExp.source}`,"g");
         const split = src.split('\n');
         context.font = `bold ${this.fontSize}px ${this.fontName}`;
         for(let i = 0; i < split.length; i++){
